@@ -1,5 +1,6 @@
 const { tb_post, tb_user} = require('../../models')
 const fs = require('fs');
+const cloudinary = require("../utils/cloudinary");
 
 exports.addBlog = async (request, response) => {
     try {
@@ -15,11 +16,17 @@ exports.addBlog = async (request, response) => {
       findUser = {
         ...findUser,
       };
+
+      const result = await cloudinary.uploader.upload(request.file.path, {
+        folder: "blog_files",
+        use_filename: true,
+        unique_filename: true,
+      });
   
       let newPost = await tb_post.create({
         title: request.body.title,
         desc: request.body.desc,
-        image: request.file.filename,
+        image: result.public_id,
         idUser: user,
         data: {
           id: user.id,
